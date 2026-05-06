@@ -1,0 +1,336 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+  background: #1a1a2e;
+  color: #eee;
+  padding: 20px;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+h1 {
+  text-align: center;
+  margin-bottom: 24px;
+  color: #e0e0ff;
+  font-size: 1.8em;
+}
+
+h2 {
+  margin-bottom: 12px;
+  color: #b0b0dd;
+  font-size: 1.1em;
+}
+
+.card {
+  background: #16213e;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+  border: 1px solid #0f3460;
+}
+
+.arrow-rules {
+  display: flex;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.rule {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rule label {
+  font-weight: 600;
+  min-width: 60px;
+}
+
+.rule select {
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid #0f3460;
+  background: #1a1a2e;
+  color: #eee;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.btn-remove-sm {
+  background: #c0392b;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  width: 22px;
+  height: 22px;
+  cursor: pointer;
+  font-size: 11px;
+  font-weight: bold;
+  line-height: 22px;
+}
+
+/* --- Tabs --- */
+
+.input-mode-tabs {
+  display: flex;
+  gap: 4px;
+  margin-bottom: 14px;
+}
+
+.tab {
+  padding: 8px 18px;
+  border: 1px solid #0f3460;
+  background: #1a1a2e;
+  color: #888;
+  border-radius: 6px 6px 0 0;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.tab.active {
+  background: #0f3460;
+  color: #eee;
+  border-bottom-color: #0f3460;
+}
+
+/* --- Bulk paste --- */
+
+#bulk-text {
+  width: 100%;
+  min-height: 160px;
+  padding: 12px;
+  border-radius: 6px;
+  border: 1px solid #0f3460;
+  background: #1a1a2e;
+  color: #eee;
+  font-size: 14px;
+  font-family: "Consolas", "Courier New", monospace;
+  resize: vertical;
+  margin-bottom: 10px;
+}
+
+#bulk-text::placeholder {
+  color: #555;
+}
+
+/* --- Manual ranges --- */
+
+.range-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.range-row input {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border: 1px solid #0f3460;
+  background: #1a1a2e;
+  color: #eee;
+  font-size: 15px;
+  font-family: "Consolas", "Courier New", monospace;
+  text-transform: uppercase;
+}
+
+.range-row input::placeholder {
+  color: #555;
+}
+
+.thru {
+  font-weight: 700;
+  color: #888;
+  font-size: 13px;
+  min-width: 40px;
+  text-align: center;
+}
+
+.btn-remove {
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 6px;
+  width: 32px;
+  height: 32px;
+  cursor: pointer;
+  font-weight: bold;
+  font-size: 14px;
+}
+
+.btn-remove:hover {
+  background: #c0392b;
+}
+
+.btn-secondary {
+  background: transparent;
+  color: #5dade2;
+  border: 1px dashed #5dade2;
+  border-radius: 6px;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.btn-secondary:hover {
+  background: rgba(93, 173, 226, 0.1);
+}
+
+/* --- Actions --- */
+
+.actions {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.btn-primary {
+  flex: 1;
+  padding: 14px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  background: #0f3460;
+  color: #eee;
+  transition: background 0.2s;
+}
+
+.btn-primary:hover {
+  background: #1a4a8a;
+}
+
+.btn-generate {
+  background: #1e8449;
+}
+
+.btn-generate:hover {
+  background: #27ae60;
+}
+
+/* --- Preview --- */
+
+#preview-section {
+  max-height: 350px;
+  overflow-y: auto;
+}
+
+#preview-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 6px;
+}
+
+.preview-item {
+  padding: 6px 10px;
+  background: #1a1a2e;
+  border-radius: 4px;
+  font-family: "Consolas", monospace;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.arrow-indicator {
+  font-size: 16px;
+}
+
+/* --- CSV drop zone --- */
+
+#csv-dropzone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 40px 20px;
+  border: 2px dashed #0f3460;
+  border-radius: 10px;
+  background: #1a1a2e;
+  text-align: center;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+#csv-dropzone.drag-over {
+  border-color: #5dade2;
+  background: rgba(93, 173, 226, 0.08);
+}
+
+#csv-dropzone p {
+  color: #888;
+  margin: 0;
+}
+
+.drop-sub {
+  font-size: 12px;
+  color: #555 !important;
+}
+
+.drop-hint {
+  font-size: 12px;
+  color: #555 !important;
+  margin-top: 4px;
+}
+
+#csv-loaded {
+  padding: 16px;
+  background: #1a1a2e;
+  border-radius: 8px;
+  border: 1px solid #0f3460;
+}
+
+#csv-summary {
+  margin-bottom: 12px;
+  line-height: 1.6;
+}
+
+.bulk-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+#progress-container {
+  margin-bottom: 8px;
+}
+
+#progress-bar {
+  width: 100%;
+  height: 20px;
+  background: #1a1a2e;
+  border-radius: 10px;
+  border: 1px solid #0f3460;
+  overflow: hidden;
+}
+
+#progress-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #1e8449, #27ae60);
+  border-radius: 10px;
+  transition: width 0.3s;
+}
+
+#status {
+  text-align: center;
+  padding: 10px;
+  color: #5dade2;
+  font-size: 14px;
+}
+
+#label-count {
+  color: #5dade2;
+  font-weight: normal;
+  font-size: 0.9em;
+}

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Best Way Easy Label Generator</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>Best Way Easy Label Generator</h1>
+
+    <section class="card">
+      <h2>Arrow Direction (by Level)</h2>
+      <div id="arrow-rules" class="arrow-rules"></div>
+      <button class="btn-secondary" onclick="addLevel()" style="margin-top:8px">+ Add Level</button>
+    </section>
+
+    <section class="card">
+      <h2>Location Ranges</h2>
+
+      <div class="input-mode-tabs">
+        <button class="tab active" id="tab-manual" onclick="switchTab('manual')">Manual Entry</button>
+        <button class="tab" id="tab-bulk" onclick="switchTab('bulk')">Bulk Paste</button>
+        <button class="tab" id="tab-csv" onclick="switchTab('csv')">Import CSV</button>
+      </div>
+
+      <div id="manual-input">
+        <div id="ranges-container">
+          <div class="range-row">
+            <input type="text" class="range-start" placeholder="K2-01-01-1" />
+            <span class="thru">THRU</span>
+            <input type="text" class="range-end" placeholder="K2-01-100-3" />
+            <button class="btn-remove" onclick="removeRange(this)" title="Remove">X</button>
+          </div>
+        </div>
+        <button class="btn-secondary" onclick="addRange()">+ Add Range</button>
+      </div>
+
+      <div id="bulk-input" style="display:none">
+        <textarea id="bulk-text" placeholder="Paste ranges one per line, e.g.:&#10;K2-02-01-1 THRU K2-02-105-3&#10;K2-03-01-1 THRU K2-03-105-3&#10;K2-04-01-1 THRU K2-04-105-3&#10;K2-EW-001 THRU K2-EW-050"></textarea>
+        <div class="bulk-buttons">
+          <button class="btn-secondary" onclick="parseBulk()">Load into Manual Entry</button>
+          <button class="btn-secondary" onclick="bulkCsvUpload()">Upload CSV Instead</button>
+        </div>
+      </div>
+
+      <div id="csv-input" style="display:none">
+        <div id="csv-dropzone" ondragover="csvDragOver(event)" ondragleave="csvDragLeave(event)" ondrop="csvDrop(event)">
+          <p>Drag & drop a CSV file here</p>
+          <p class="drop-sub">or</p>
+          <button class="btn-secondary" onclick="csvBrowse()">Browse for CSV</button>
+          <p class="drop-hint">Format: Location,Arrow (e.g. K2-02-01-1,DOWN)</p>
+        </div>
+        <div id="csv-loaded" style="display:none">
+          <div id="csv-summary"></div>
+          <button class="btn-secondary" onclick="clearCsv()">Clear CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <section class="actions">
+      <button class="btn-primary" onclick="previewLabels()">Preview</button>
+      <button class="btn-primary btn-generate" onclick="generatePdf()">Generate PDF</button>
+    </section>
+
+    <section class="card" id="preview-section" style="display:none">
+      <h2>Preview <span id="label-count"></span></h2>
+      <div id="preview-list"></div>
+    </section>
+
+    <div id="progress-container" style="display:none">
+      <div id="progress-bar"><div id="progress-fill"></div></div>
+    </div>
+    <div id="status"></div>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html>
