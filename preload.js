@@ -8,4 +8,23 @@ contextBridge.exposeInMainWorld("api", {
   downloadExample: (name) => ipcRenderer.invoke("download-example", name),
   listExamples: () => ipcRenderer.invoke("list-examples"),
   openPromptGuide: () => ipcRenderer.invoke("open-prompt-guide"),
+
+  checkForUpdate: () => ipcRenderer.invoke("update:check"),
+  downloadUpdate: () => ipcRenderer.invoke("update:download"),
+  installUpdate: () => ipcRenderer.invoke("update:install"),
+  onUpdateEvent: (handler) => {
+    const channels = [
+      "update-available",
+      "update-not-available",
+      "update-progress",
+      "update-downloaded",
+      "update-error",
+    ];
+    const subs = channels.map((ch) => {
+      const fn = (_e, payload) => handler(ch, payload);
+      ipcRenderer.on(ch, fn);
+      return () => ipcRenderer.removeListener(ch, fn);
+    });
+    return () => subs.forEach((u) => u());
+  },
 });

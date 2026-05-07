@@ -2,6 +2,7 @@ const { app, BrowserWindow, Menu, ipcMain, dialog, shell } = require("electron")
 const path = require("path");
 const { spawn } = require("child_process");
 const fs = require("fs");
+const { autoUpdater } = require("electron-updater");
 
 // Single-instance lock — second launch focuses the existing window instead of opening a new one
 const gotLock = app.requestSingleInstanceLock();
@@ -169,10 +170,79 @@ app.on("second-instance", () => {
   }
 });
 
+// ---------- Auto-update (electron-updater + GitHub Releases) ----------
+
+autoUpdater.autoDownload = false;
+autoUpdater.autoInstallOnAppQuit = true;
+
+function sendUpdate(channel, payload) {
+  if (mainWindow && !mainWindow.isDestroyed()) {
+    mainWindow.webContents.send(channel, payload);
+  }
+}
+
+autoUpdater.on("update-available", (info) => {
+  sendUpdate("update-available", { version: info.version, releaseNotes: info.releaseNotes });
+});
+
+autoUpdater.on("update-not-available", () => {
+  sendUpdate("update-not-available");
+});
+
+autoUpdater.on("download-progress", (progress) => {
+  sendUpdate("update-progress", {
+    percent: Math.round(progress.percent),
+    transferred: progress.transferred,
+    total: progress.total,
+    bytesPerSecond: progress.bytesPerSecond,
+  });
+});
+
+autoUpdater.on("update-downloaded", (info) => {
+  sendUpdate("update-downloaded", { version: info.version });
+});
+
+autoUpdater.on("error", (err) => {
+  sendUpdate("update-error", { message: String(err && err.message ? err.message : err) });
+});
+
+ipcMain.handle("update:check", async () => {
+  if (!app.isPackaged) return { skipped: true, reason: "dev mode" };
+  try {
+    const r = await autoUpdater.checkForUpdates();
+    return { ok: true, updateInfo: r && r.updateInfo ? { version: r.updateInfo.version } : null };
+  } catch (e) {
+    return { ok: false, error: String(e && e.message ? e.message : e) };
+  }
+});
+
+ipcMain.handle("update:download", async () => {
+  try {
+    await autoUpdater.downloadUpdate();
+    return { ok: true };
+  } catch (e) {
+    return { ok: false, error: String(e && e.message ? e.message : e) };
+  }
+});
+
+ipcMain.handle("update:install", () => {
+  // Quit, run installer, relaunch
+  autoUpdater.quitAndInstall(false, true);
+});
+
 app.whenReady().then(() => {
   Menu.setApplicationMenu(null);
   startBackend();
   setTimeout(createWindow, 1500);
+
+  // Background update check (only in packaged builds)
+  if (app.isPackaged) {
+    setTimeout(() => {
+      autoUpdater.checkForUpdates().catch((e) => {
+        console.log("[updater] check failed:", e && e.message ? e.message : e);
+      });
+    }, 4000);
+  }
 
   app.on("activate", () => {
     if (BrowserWindow.getAllWindows().length === 0) createWindow();

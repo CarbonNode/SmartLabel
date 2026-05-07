@@ -802,6 +802,65 @@ async function openPromptGuide() {
   }
 }
 
+// --- Auto-update toast ---
+
+function setUpdateState(state) {
+  document.querySelector(".up-state-available").style.display = state === "available" ? "grid" : "none";
+  document.querySelector(".up-state-downloading").style.display = state === "downloading" ? "grid" : "none";
+  document.querySelector(".up-state-ready").style.display = state === "ready" ? "grid" : "none";
+}
+
+function showUpdateToast(state) {
+  setUpdateState(state);
+  const toast = document.getElementById("update-toast");
+  toast.classList.add("show");
+  toast.setAttribute("aria-hidden", "false");
+}
+
+function dismissUpdateToast() {
+  const toast = document.getElementById("update-toast");
+  toast.classList.remove("show");
+  toast.setAttribute("aria-hidden", "true");
+}
+
+async function startUpdateDownload() {
+  showUpdateToast("downloading");
+  document.getElementById("up-progress-sub").textContent = "Starting…";
+  document.getElementById("up-bar-fill").style.width = "0%";
+  if (window.api && window.api.downloadUpdate) {
+    const r = await window.api.downloadUpdate();
+    if (r && r.ok === false) {
+      dismissUpdateToast();
+      setStatus(`Update download failed: ${r.error || "unknown error"}`);
+    }
+  }
+}
+
+async function installUpdateNow() {
+  if (window.api && window.api.installUpdate) {
+    await window.api.installUpdate();
+  }
+}
+
+if (window.api && window.api.onUpdateEvent) {
+  window.api.onUpdateEvent((channel, payload) => {
+    if (channel === "update-available") {
+      const v = payload && payload.version ? `v${payload.version}` : "new version";
+      document.getElementById("up-version-sub").textContent = `${v} ready to install`;
+      showUpdateToast("available");
+    } else if (channel === "update-progress") {
+      const pct = payload && typeof payload.percent === "number" ? payload.percent : 0;
+      document.getElementById("up-bar-fill").style.width = `${pct}%`;
+      document.getElementById("up-progress-sub").textContent = `${pct}%`;
+    } else if (channel === "update-downloaded") {
+      showUpdateToast("ready");
+    } else if (channel === "update-error") {
+      // Keep silent unless a download was already in progress
+      console.log("[updater]", payload && payload.message);
+    }
+  });
+}
+
 // --- Init ---
 for (let i = 0; i < 6; i++) addRange();
 showBulkPasteView();

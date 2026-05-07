@@ -80,6 +80,21 @@ Use `release:minor` or `release:major` for bigger jumps. The script:
 
 **Always increment the version** so the installer filename and EXE metadata differ from prior builds. Best Way can identify which version they're running by right-clicking `SmartLabel.exe` → Properties → Details.
 
+## Auto-update
+
+`electron-updater` checks GitHub Releases on app startup (4-second delay so backend can come up first). Only runs in packaged builds — `app.isPackaged` guard, dev mode is silent.
+
+Flow:
+1. Open app → background check fetches `latest.yml` from latest GitHub release
+2. If newer version found → bottom-right toast with **Update** / **Later**
+3. **Update** → `autoUpdater.downloadUpdate()` runs, toast shows progress %
+4. Download finishes → toast switches to **Restart** state
+5. **Restart** → `quitAndInstall(false, true)` runs the NSIS installer and relaunches
+
+The toast is `#update-toast` in `index.html` with three sub-states (available / downloading / ready). State switching lives in `renderer.js#setUpdateState`. Errors get logged to console but no toast (silent fail — don't pester the user if GitHub is unreachable).
+
+Note: auto-update only works going *forward* from the first release that contains the auto-updater code (v2.0.2+). Older installs (v2.0.1) won't auto-update — those users need to download v2.0.2 manually once.
+
 ## Bulk Paste DSL
 
 `renderer.js#analyzeBulkText` parses each line of the bulk paste textarea. End-of-line modifiers (combinable, any order):
