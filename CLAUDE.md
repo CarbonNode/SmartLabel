@@ -67,6 +67,11 @@ npm run build:backend     # rebuild backend exe if backend/* changed
 npm run release:patch     # bumps 2.0.0 -> 2.0.1, builds installer, uploads to GitHub Releases as a DRAFT
 ```
 
+**Gotcha**: `setx` only loads `GH_TOKEN` into *new* shells. If your current shell was open before you ran `setx`, the env var won't be present and `electron-builder` will fail at upload with `Error: GitHub Personal Access Token is not set`. Two fixes:
+
+- Open a fresh PowerShell after `setx` and run the release there.
+- Or inline the token for one run: `GH_TOKEN="ghp_..." npx electron-builder --publish always`
+
 Use `release:minor` or `release:major` for bigger jumps. The script:
 1. Bumps the version in `package.json`
 2. Creates a git commit `chore: release v<version>` and a matching tag
