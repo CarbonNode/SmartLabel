@@ -3,6 +3,11 @@ const path = require("path");
 const { spawn } = require("child_process");
 const fs = require("fs");
 const { autoUpdater } = require("electron-updater");
+const log = require("electron-log");
+
+// Log everything (writes to %APPDATA%\SmartLabel\logs\main.log on Windows)
+log.transports.file.level = "debug";
+autoUpdater.logger = log;
 
 // Single-instance lock — second launch focuses the existing window instead of opening a new one
 const gotLock = app.requestSingleInstanceLock();
@@ -210,11 +215,15 @@ ipcMain.handle("update:check", async () => {
   if (!app.isPackaged) return { skipped: true, reason: "dev mode" };
   try {
     const r = await autoUpdater.checkForUpdates();
-    return { ok: true, updateInfo: r && r.updateInfo ? { version: r.updateInfo.version } : null };
+    const remote = r && r.updateInfo ? r.updateInfo.version : null;
+    const current = app.getVersion();
+    return { ok: true, current, remote, hasUpdate: !!(remote && remote !== current) };
   } catch (e) {
     return { ok: false, error: String(e && e.message ? e.message : e) };
   }
 });
+
+ipcMain.handle("app:version", () => app.getVersion());
 
 ipcMain.handle("update:download", async () => {
   try {
@@ -242,7 +251,7 @@ app.whenReady().then(() => {
         console.log("[updater] check failed:", e && e.message ? e.message : e);
       });
     setTimeout(safeCheck, 4000);
-    setInterval(safeCheck, 15 * 60 * 1000); // re-check every 15 minutes
+    setInterval(safeCheck, 2 * 60 * 1000); // re-check every 2 minutes
   }
 
   app.on("activate", () => {

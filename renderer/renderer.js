@@ -808,6 +808,46 @@ let dismissedUpdateVersion = null;
 let updateInProgress = false;
 let availableUpdateVersion = null;
 
+async function initVersionBadge() {
+  if (!window.api || !window.api.appVersion) return;
+  const v = await window.api.appVersion();
+  const el = document.getElementById("version-badge");
+  if (el) el.textContent = `v${v}`;
+}
+
+async function manualCheckForUpdate() {
+  const el = document.getElementById("version-badge");
+  if (!window.api || !window.api.checkForUpdate) return;
+  if (!el) return;
+  const original = el.textContent;
+  el.classList.remove("uptodate", "error");
+  el.classList.add("checking");
+  el.textContent = "checking…";
+  const r = await window.api.checkForUpdate();
+  if (r && r.skipped) {
+    el.textContent = `${original} (dev)`;
+    el.classList.remove("checking");
+    setTimeout(() => { el.textContent = original; }, 2000);
+    return;
+  }
+  el.classList.remove("checking");
+  if (r && r.ok === false) {
+    el.classList.add("error");
+    el.textContent = "check failed";
+    setTimeout(() => { el.classList.remove("error"); el.textContent = original; }, 4000);
+    return;
+  }
+  if (r && r.hasUpdate) {
+    // Toast will fire via update-available event; just reset badge label
+    el.textContent = original;
+    return;
+  }
+  // Up to date
+  el.classList.add("uptodate");
+  el.textContent = "up to date";
+  setTimeout(() => { el.classList.remove("uptodate"); el.textContent = original; }, 2500);
+}
+
 function setUpdateState(state) {
   document.querySelector(".up-state-available").style.display = state === "available" ? "grid" : "none";
   document.querySelector(".up-state-downloading").style.display = state === "downloading" ? "grid" : "none";
@@ -879,3 +919,4 @@ if (window.api && window.api.onUpdateEvent) {
 // --- Init ---
 for (let i = 0; i < 6; i++) addRange();
 showBulkPasteView();
+initVersionBadge();

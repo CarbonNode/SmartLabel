@@ -9,6 +9,7 @@ contextBridge.exposeInMainWorld("api", {
   listExamples: () => ipcRenderer.invoke("list-examples"),
   openPromptGuide: () => ipcRenderer.invoke("open-prompt-guide"),
 
+  appVersion: () => ipcRenderer.invoke("app:version"),
   checkForUpdate: () => ipcRenderer.invoke("update:check"),
   downloadUpdate: () => ipcRenderer.invoke("update:download"),
   installUpdate: () => ipcRenderer.invoke("update:install"),
