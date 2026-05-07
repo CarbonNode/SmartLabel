@@ -1,29 +1,75 @@
 {
-  "name": "best-way-easy-label-generator",
+  "name": "smartlabel",
   "version": "2.0.0",
-  "description": "Best Way Easy Label Generator - warehouse location labels with barcodes",
+  "description": "SmartLabel - warehouse location labels with barcodes",
   "author": "Best Way Distribution",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dist": "electron-builder"
+    "dist": "electron-builder",
+    "build:backend": "cd backend && pyinstaller --clean --distpath dist --workpath build label-backend.spec",
+    "release:patch": "npm version patch -m \"chore: release v%s\" && electron-builder --publish always",
+    "release:minor": "npm version minor -m \"chore: release v%s\" && electron-builder --publish always",
+    "release:major": "npm version major -m \"chore: release v%s\" && electron-builder --publish always",
+    "publish": "electron-builder --publish always"
   },
   "build": {
-    "appId": "com.bestway.labelgenerator",
-    "productName": "Best Way Easy Label Generator",
+    "appId": "com.bestway.smartlabel",
+    "productName": "SmartLabel",
+    "executableName": "SmartLabel",
+    "artifactName": "SmartLabel-Setup-${version}.${ext}",
+    "publish": [
+      {
+        "provider": "github",
+        "owner": "CarbonNode",
+        "repo": "SmartLabel"
+      }
+    ],
     "win": {
-      "target": "portable",
-      "signAndEditExecutable": false
+      "target": "nsis",
+      "icon": "build/icon.ico",
+      "requestedExecutionLevel": "asInvoker"
+    },
+    "nsis": {
+      "oneClick": false,
+      "perMachine": false,
+      "allowElevation": true,
+      "allowToChangeInstallationDirectory": true,
+      "createDesktopShortcut": true,
+      "createStartMenuShortcut": true,
+      "shortcutName": "SmartLabel",
+      "uninstallDisplayName": "SmartLabel",
+      "installerIcon": "build/icon.ico",
+      "uninstallerIcon": "build/icon.ico",
+      "installerHeaderIcon": "build/icon.ico"
     },
     "files": [
       "main.js",
       "preload.js",
-      "renderer/**/*"
+      "renderer/**/*",
+      "build/icon.png",
+      "build/icon.ico"
     ],
     "extraResources": [
       {
         "from": "backend/dist/label-backend.exe",
         "to": "backend/label-backend.exe"
+      },
+      {
+        "from": "docs",
+        "to": "docs"
+      },
+      {
+        "from": "assets",
+        "to": "assets"
+      },
+      {
+        "from": "build/icon.png",
+        "to": "build/icon.png"
+      },
+      {
+        "from": "build/icon.ico",
+        "to": "build/icon.ico"
       }
     ]
   },

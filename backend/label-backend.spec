@@ -1,12 +1,23 @@
 # -*- mode: python ; coding: utf-8 -*-
 
+from PyInstaller.utils.hooks import collect_all, collect_data_files, collect_submodules
+
+# Pull in everything these packages ship — covers data files (fonts, etc.),
+# submodules and dynamic imports that PyInstaller wouldn't otherwise pick up.
+datas, binaries, hiddenimports = [], [], []
+
+for pkg in ("barcode", "reportlab", "PIL", "flask", "flask_cors", "werkzeug", "jinja2", "click", "itsdangerous", "markupsafe"):
+    d, b, h = collect_all(pkg)
+    datas += d
+    binaries += b
+    hiddenimports += h
 
 a = Analysis(
     ['server.py'],
     pathex=[],
-    binaries=[],
-    datas=[],
-    hiddenimports=[],
+    binaries=binaries,
+    datas=datas,
+    hiddenimports=hiddenimports,
     hookspath=[],
     hooksconfig={},
     runtime_hooks=[],

@@ -4,3 +4,5 @@ backend/dist/
 backend/build/
 backend/__pycache__/
 *.pyc
+.claude/
+.tmp_*

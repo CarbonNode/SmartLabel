@@ -3,54 +3,101 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Best Way Easy Label Generator</title>
+  <title>SmartLabel</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
+  <header class="app-header">
+    <div class="app-header-inner">
+      <div class="brand">
+        <div class="brand-mark">
+          <img src="../build/icon.png" alt="" />
+        </div>
+        <div class="brand-text">
+          <div class="brand-title">SmartLabel</div>
+          <div class="brand-sub">Warehouse Location Labels</div>
+        </div>
+      </div>
+      <div class="header-actions">
+        <button class="btn-help" onclick="openPromptGuide()" title="How to ask AI to build a CSV">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2a4 4 0 0 1 4 4c0 2.5-2 3.5-2 5h-4c0-1.5-2-2.5-2-5a4 4 0 0 1 4-4z"/><line x1="10" y1="15" x2="14" y2="15"/><line x1="11" y1="18" x2="13" y2="18"/></svg>
+          AI Prompt
+        </button>
+        <button class="btn-help" onclick="openExamples()" title="Browse example CSVs">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="9" y1="9" x2="11" y2="9"/></svg>
+          Examples
+        </button>
+        <button class="btn-help" onclick="openGuide()" title="Open user guide">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.1 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12" y2="17"/></svg>
+          How to Use
+        </button>
+      </div>
+    </div>
+  </header>
+
   <div class="container">
-    <h1>Best Way Easy Label Generator</h1>
 
-    <section class="card">
-      <h2>Arrow Direction (by Level)</h2>
-      <div id="arrow-rules" class="arrow-rules"></div>
-      <button class="btn-secondary" onclick="addLevel()" style="margin-top:8px">+ Add Level</button>
-    </section>
-
-    <section class="card">
+    <section class="card card-fill" id="ranges-card">
       <h2>Location Ranges</h2>
 
       <div class="input-mode-tabs">
-        <button class="tab active" id="tab-manual" onclick="switchTab('manual')">Manual Entry</button>
-        <button class="tab" id="tab-bulk" onclick="switchTab('bulk')">Bulk Paste</button>
+        <button class="tab active" id="tab-bulk" onclick="switchTab('bulk')">Bulk Paste</button>
+        <button class="tab" id="tab-manual" onclick="switchTab('manual')">Manual Entry</button>
         <button class="tab" id="tab-csv" onclick="switchTab('csv')">Import CSV</button>
       </div>
 
-      <div id="manual-input">
-        <div id="ranges-container">
-          <div class="range-row">
-            <input type="text" class="range-start" placeholder="K2-01-01-1" />
-            <span class="thru">THRU</span>
-            <input type="text" class="range-end" placeholder="K2-01-100-3" />
-            <button class="btn-remove" onclick="removeRange(this)" title="Remove">X</button>
-          </div>
-        </div>
+      <div id="manual-input" style="display:none">
+        <div id="ranges-container"></div>
         <button class="btn-secondary" onclick="addRange()">+ Add Range</button>
       </div>
 
-      <div id="bulk-input" style="display:none">
-        <textarea id="bulk-text" placeholder="Paste ranges one per line, e.g.:&#10;K2-02-01-1 THRU K2-02-105-3&#10;K2-03-01-1 THRU K2-03-105-3&#10;K2-04-01-1 THRU K2-04-105-3&#10;K2-EW-001 THRU K2-EW-050"></textarea>
-        <div class="bulk-buttons">
-          <button class="btn-secondary" onclick="parseBulk()">Load into Manual Entry</button>
-          <button class="btn-secondary" onclick="bulkCsvUpload()">Upload CSV Instead</button>
+      <div id="bulk-input">
+        <div id="bulk-paste-view">
+          <div class="bulk-toolbar">
+            <span id="bulk-count-paste" class="bulk-count">0 labels</span>
+            <div class="bulk-toolbar-actions">
+              <button class="btn-secondary btn-show-pills" id="btn-show-pills" onclick="showBulkPillsView()" title="Switch to pill view" disabled>
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+                Show Pills
+              </button>
+              <button class="btn-secondary btn-clear-bulk" onclick="clearBulkText()" title="Clear all">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Clear
+              </button>
+            </div>
+          </div>
+          <textarea id="bulk-text" oninput="onBulkInput()" onpaste="setTimeout(maybeAutoSwitchToPills, 50)" placeholder="Paste your batch here, one per line:&#10;&#10;K2-02-01-1 THRU K2-02-100-3&#10;K2-02-018-1 THRU K2-02-060-1 EVEN ONLY&#10;K2-04-072-2 THRU K3-04-078-2 EVEN ONLY {UP}&#10;K2-04-001-1 SINGLE LOCATION&#10;K2-EW-001 THRU K2-EW-050 {NONE}&#10;K2-01-01-1 THRU K2-01-100-3 TOP DOWN&#10;&#10;# Modifiers (any combination, end of line):&#10;#   EVEN ONLY / ODDS ONLY / EVEN AND ODDS&#10;#   SINGLE LOCATION&#10;#   TOP DOWN  (level 3, 2, 1 per bay) — opposite of default&#10;#   {UP} / {DOWN} / {NONE}  arrow override"></textarea>
+        </div>
+        <div id="bulk-pills-view" style="display:none">
+          <div class="bulk-toolbar">
+            <span id="bulk-count" class="bulk-count">0 labels</span>
+            <div class="bulk-toolbar-actions">
+              <button class="btn-secondary btn-edit-bulk" onclick="showBulkPasteView()" title="Switch back to raw text">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+                Edit Text
+              </button>
+              <button class="btn-secondary btn-clear-bulk" onclick="clearBulkText()" title="Clear all">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/></svg>
+                Clear
+              </button>
+            </div>
+          </div>
+          <div id="bulk-pills" class="bulk-pills"></div>
+          <div class="bulk-quickadd">
+            <input type="text" id="bulk-quickadd-input" placeholder="Add a range — e.g. K2-02-018-1 THRU K2-02-060-1 EVEN ONLY {DOWN}" onkeydown="if(event.key==='Enter'){quickAddBulkLine();event.preventDefault();}" />
+            <button class="btn-secondary btn-quickadd" onclick="quickAddBulkLine()" title="Append to list">+ Add</button>
+          </div>
         </div>
       </div>
 
       <div id="csv-input" style="display:none">
         <div id="csv-dropzone" ondragover="csvDragOver(event)" ondragleave="csvDragLeave(event)" ondrop="csvDrop(event)">
-          <p>Drag & drop a CSV file here</p>
-          <p class="drop-sub">or</p>
+          <svg class="drop-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+          <div>
+            <p class="drop-text">Drag &amp; drop a CSV file here</p>
+            <p class="drop-hint">Format: Location,Arrow (e.g. K2-02-01-1,DOWN)</p>
+          </div>
           <button class="btn-secondary" onclick="csvBrowse()">Browse for CSV</button>
-          <p class="drop-hint">Format: Location,Arrow (e.g. K2-02-01-1,DOWN)</p>
         </div>
         <div id="csv-loaded" style="display:none">
           <div id="csv-summary"></div>
@@ -69,11 +116,32 @@
       <div id="preview-list"></div>
     </section>
 
-    <div id="progress-container" style="display:none">
-      <div id="progress-bar"><div id="progress-fill"></div></div>
-    </div>
     <div id="status"></div>
   </div>
+
+  <div id="gen-overlay" aria-hidden="true">
+    <div class="gen-card">
+      <div id="gen-progress-state">
+        <div class="gen-spinner">
+          <div class="gen-ring"></div>
+          <div class="gen-icon"><img src="../build/icon.png" alt="" /></div>
+        </div>
+        <div class="gen-title">Generating PDF</div>
+        <div class="gen-count" id="gen-count">Preparing…</div>
+        <div class="gen-bar"><div class="gen-fill" id="gen-fill"></div></div>
+      </div>
+
+      <div id="gen-done-state" style="display:none">
+        <div class="gen-check">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+        </div>
+        <div class="gen-title gen-title-success">PDF Saved</div>
+        <div class="gen-path" id="gen-path"></div>
+        <button class="gen-done-btn" id="gen-done-btn" onclick="dismissGenOverlay()">Done</button>
+      </div>
+    </div>
+  </div>
+
   <script src="renderer.js"></script>
 </body>
 </html>

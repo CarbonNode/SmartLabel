@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Example CSVs - SmartLabel</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg-elev: #0f1525;
+      --card: #121a2e;
+      --border: #1d2845;
+      --border-strong: #2b3a64;
+      --accent: #2f7dff;
+      --accent-bright: #4d97ff;
+      --accent-soft: rgba(47, 125, 255, 0.14);
+      --accent-glow: rgba(47, 125, 255, 0.35);
+      --success: #22c55e;
+      --text: #e6ecff;
+      --text-muted: #8a96bd;
+      --text-dim: #5a6585;
+      --mono: "JetBrains Mono", "Cascadia Mono", "Consolas", monospace;
+      --sans: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, "Inter", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--sans);
+      background: radial-gradient(1200px 600px at 50% -200px, rgba(47, 125, 255, 0.08), transparent 60%), var(--bg);
+      color: var(--text);
+      font-size: 14px;
+      line-height: 1.55;
+      padding: 32px 28px 40px;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 660px; margin: 0 auto; }
+    .head {
+      display: flex; align-items: center; gap: 14px;
+      padding-bottom: 18px; margin-bottom: 24px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mark {
+      width: 48px; height: 48px; border-radius: 11px;
+      background: var(--bg-elev);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 1px var(--border-strong), 0 8px 32px rgba(47, 125, 255, 0.18);
+    }
+    .mark img { width: 36px; height: 36px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+    .head h1 { font-size: 20px; font-weight: 600; }
+    .head .sub { font-size: 12px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; margin-top: 2px; }
+
+    .ex {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 16px 18px;
+      margin-bottom: 12px;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 14px;
+      align-items: center;
+      transition: border-color 0.15s ease;
+    }
+    .ex:hover { border-color: var(--border-strong); }
+
+    .ex-info h2 {
+      font-size: 15px; font-weight: 600;
+      color: var(--text); margin-bottom: 4px;
+    }
+    .ex-info p {
+      font-size: 13px; color: var(--text-muted); line-height: 1.5;
+    }
+    .ex-file {
+      font-family: var(--mono); font-size: 11.5px;
+      color: var(--text-dim); margin-top: 6px; letter-spacing: 0.3px;
+    }
+
+    .btn {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 16px;
+      border-radius: 10px; border: 1px solid var(--accent);
+      background: linear-gradient(180deg, rgba(77, 151, 255, 0.18), rgba(47, 125, 255, 0.06)), var(--bg-elev);
+      color: var(--accent-bright); font-weight: 600; font-size: 13px;
+      cursor: pointer; transition: all 0.15s ease;
+      box-shadow: 0 0 14px rgba(47, 125, 255, 0.18);
+      white-space: nowrap;
+      min-width: 130px;
+      justify-content: center;
+      font-family: inherit;
+    }
+    .btn:hover {
+      background: linear-gradient(180deg, rgba(77, 151, 255, 0.32), rgba(47, 125, 255, 0.16)), var(--bg-elev);
+      color: white;
+      box-shadow: 0 0 22px rgba(47, 125, 255, 0.4);
+      transform: translateY(-1px);
+    }
+    .btn:active { transform: translateY(0); }
+    .btn.saved {
+      border-color: var(--success);
+      background: rgba(34, 197, 94, 0.12);
+      color: var(--success);
+      box-shadow: 0 0 14px rgba(34, 197, 94, 0.25);
+    }
+    .btn svg { width: 14px; height: 14px; }
+
+    .empty {
+      color: var(--text-dim);
+      text-align: center;
+      padding: 40px;
+      font-size: 13px;
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header class="head">
+      <div class="mark"><img src="../build/icon.png" alt="" /></div>
+      <div>
+        <h1>Example CSVs</h1>
+        <div class="sub">Drop into the Import CSV tab</div>
+      </div>
+    </header>
+
+    <div id="list"></div>
+  </div>
+
+  <script>
+    const SVG_NS = "http://www.w3.org/2000/svg";
+
+    function svg(pathSpecs, strokeWidth) {
+      const s = document.createElementNS(SVG_NS, "svg");
+      s.setAttribute("viewBox", "0 0 24 24");
+      s.setAttribute("fill", "none");
+      s.setAttribute("stroke", "currentColor");
+      s.setAttribute("stroke-width", strokeWidth || "2.2");
+      s.setAttribute("stroke-linecap", "round");
+      s.setAttribute("stroke-linejoin", "round");
+      pathSpecs.forEach((spec) => {
+        const el = document.createElementNS(SVG_NS, spec.tag);
+        Object.entries(spec.attrs).forEach(([k, v]) => el.setAttribute(k, v));
+        s.appendChild(el);
+      });
+      return s;
+    }
+
+    function downloadIcon() {
+      return svg([
+        { tag: "path", attrs: { d: "M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" } },
+        { tag: "polyline", attrs: { points: "7 10 12 15 17 10" } },
+        { tag: "line", attrs: { x1: "12", y1: "15", x2: "12", y2: "3" } },
+      ]);
+    }
+    function checkIcon() {
+      return svg([{ tag: "polyline", attrs: { points: "20 6 9 17 4 12" } }], "2.4");
+    }
+
+    function setBtnContent(btn, iconEl, label) {
+      btn.replaceChildren(iconEl, document.createTextNode(" " + label));
+    }
+
+    function el(tag, className, text) {
+      const e = document.createElement(tag);
+      if (className) e.className = className;
+      if (text != null) e.textContent = text;
+      return e;
+    }
+
+    function showEmpty(message) {
+      const list = document.getElementById("list");
+      list.replaceChildren(el("div", "empty", message));
+    }
+
+    async function init() {
+      let examples = [];
+      try {
+        examples = await window.api.listExamples();
+      } catch (e) {
+        showEmpty("Failed to load examples.");
+        return;
+      }
+      if (!examples || !examples.length) {
+        showEmpty("No examples bundled.");
+        return;
+      }
+
+      const list = document.getElementById("list");
+      list.replaceChildren();
+      examples.forEach((entry) => {
+        const card = el("div", "ex");
+        const info = el("div", "ex-info");
+        info.append(
+          el("h2", null, entry.name),
+          el("p", null, entry.description),
+          el("div", "ex-file", entry.file),
+        );
+        const btn = el("button", "btn");
+        setBtnContent(btn, downloadIcon(), "Download");
+        btn.addEventListener("click", async () => {
+          btn.disabled = true;
+          setBtnContent(btn, downloadIcon(), "Saving…");
+          const saved = await window.api.downloadExample(entry.file);
+          btn.disabled = false;
+          if (saved) {
+            btn.classList.add("saved");
+            setBtnContent(btn, checkIcon(), "Saved");
+            setTimeout(() => {
+              btn.classList.remove("saved");
+              setBtnContent(btn, downloadIcon(), "Download");
+            }, 2500);
+          } else {
+            setBtnContent(btn, downloadIcon(), "Download");
+          }
+        });
+        card.append(info, btn);
+        list.append(card);
+      });
+    }
+    init();
+  </script>
+</body>
+</html>

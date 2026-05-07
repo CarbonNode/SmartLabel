@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to Use — SmartLabel</title>
+  <style>
+    :root {
+      --bg: #0a0e1a;
+      --bg-elev: #0f1525;
+      --card: #121a2e;
+      --border: #1d2845;
+      --border-strong: #2b3a64;
+      --accent: #2f7dff;
+      --accent-bright: #4d97ff;
+      --accent-soft: rgba(47, 125, 255, 0.14);
+      --accent-glow: rgba(47, 125, 255, 0.35);
+      --text: #e6ecff;
+      --text-muted: #8a96bd;
+      --text-dim: #5a6585;
+      --mono: "JetBrains Mono", "Cascadia Mono", "Consolas", monospace;
+      --sans: "Segoe UI Variable", "Segoe UI", system-ui, -apple-system, "Inter", sans-serif;
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: var(--sans);
+      background: radial-gradient(1200px 600px at 50% -200px, rgba(47, 125, 255, 0.08), transparent 60%), var(--bg);
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.55;
+      padding: 40px 24px 80px;
+      min-height: 100vh;
+    }
+    .wrap { max-width: 760px; margin: 0 auto; }
+
+    /* Header */
+    .head {
+      display: flex; align-items: center; gap: 16px;
+      padding-bottom: 24px; margin-bottom: 36px;
+      border-bottom: 1px solid var(--border);
+    }
+    .mark {
+      width: 56px; height: 56px; border-radius: 12px;
+      background: var(--bg-elev);
+      display: grid; place-items: center;
+      box-shadow: 0 0 0 1px var(--border-strong), 0 8px 32px rgba(47, 125, 255, 0.18);
+    }
+    .mark img { width: 44px; height: 44px; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+    .head h1 { font-size: 22px; font-weight: 600; }
+    .head .sub { font-size: 13px; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; }
+
+    /* Intro */
+    .intro {
+      background: var(--card); border: 1px solid var(--border); border-radius: 14px;
+      padding: 18px 22px; margin-bottom: 32px; color: var(--text-muted);
+    }
+    .intro b { color: var(--text); }
+
+    /* Steps */
+    .step {
+      display: grid;
+      grid-template-columns: 48px 1fr;
+      gap: 18px;
+      margin-bottom: 32px;
+    }
+    .num {
+      width: 40px; height: 40px; border-radius: 10px;
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      color: white; font-weight: 700; font-size: 18px;
+      display: grid; place-items: center;
+      box-shadow: 0 6px 24px rgba(47, 125, 255, 0.35);
+    }
+    .step-body h2 { font-size: 18px; font-weight: 600; margin-bottom: 6px; }
+    .step-body p { color: var(--text-muted); margin-bottom: 12px; }
+    .step-body p code {
+      font-family: var(--mono); font-size: 0.9em;
+      background: var(--bg-elev); padding: 2px 6px; border-radius: 4px;
+      border: 1px solid var(--border); color: var(--accent-bright);
+    }
+
+    /* Mock UI visual blocks */
+    .mock {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 16px;
+    }
+    .mock-h { font-size: 11px; text-transform: uppercase; letter-spacing: 1.2px;
+              color: var(--text-muted); font-weight: 600; margin-bottom: 12px; }
+    .row { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 8px 12px; border-radius: 8px;
+      background: var(--bg-elev); border: 1px solid var(--border);
+      font-size: 13px;
+    }
+    .pill .lvl { color: var(--text-muted); }
+    .pill .dir { color: var(--accent-bright); font-weight: 600; font-family: var(--mono); }
+
+    .tabs {
+      display: inline-flex; gap: 4px; padding: 4px;
+      background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 10px; margin-bottom: 12px;
+    }
+    .tab { padding: 6px 14px; border-radius: 7px; font-size: 12px; font-weight: 500; color: var(--text-muted); }
+    .tab.active { background: var(--accent); color: white; }
+
+    .input-line {
+      display: flex; gap: 10px; align-items: center;
+      font-family: var(--mono); font-size: 13px;
+    }
+    .input-box {
+      flex: 1; padding: 10px 12px; border-radius: 8px;
+      background: var(--bg-elev); border: 1px solid var(--border-strong);
+      color: var(--text); letter-spacing: 0.4px;
+    }
+    .thru { color: var(--text-dim); font-weight: 700; font-size: 11px; letter-spacing: 1px; }
+
+    .csv-drop {
+      border: 2px dashed var(--border-strong); border-radius: 10px;
+      padding: 20px; text-align: center; background: var(--bg-elev);
+      color: var(--text-muted); font-size: 13px;
+    }
+
+    .pre-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 5px;
+      font-family: var(--mono); font-size: 11px;
+    }
+    .pre-cell {
+      padding: 6px 9px; background: var(--bg-elev); border: 1px solid var(--border);
+      border-radius: 6px; display: flex; justify-content: space-between;
+      letter-spacing: 0.3px;
+    }
+    .pre-cell .arr { color: var(--accent-bright); font-weight: 700; }
+
+    .btns { display: flex; gap: 10px; margin-top: 4px; }
+    .btn {
+      flex: 1; padding: 11px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; text-align: center;
+      border: 1px solid var(--border-strong); background: var(--bg-elev); color: var(--text);
+    }
+    .btn.go {
+      background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+      border-color: transparent; color: white;
+      box-shadow: 0 6px 24px rgba(47, 125, 255, 0.35);
+    }
+
+    /* Tip box */
+    .tip {
+      background: var(--accent-soft);
+      border: 1px solid rgba(47, 125, 255, 0.35);
+      border-left: 3px solid var(--accent);
+      border-radius: 8px;
+      padding: 12px 16px;
+      margin-top: 12px;
+      color: var(--text-muted);
+      font-size: 13.5px;
+    }
+    .tip b { color: var(--accent-bright); }
+
+    .foot {
+      text-align: center; color: var(--text-dim); font-size: 12px;
+      margin-top: 48px; padding-top: 24px; border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+
+    <header class="head">
+      <div class="mark"><img src="../build/icon.png" alt="" /></div>
+      <div>
+        <h1>How to Use</h1>
+        <div class="sub">SmartLabel</div>
+      </div>
+    </header>
+
+    <div class="intro">
+      Generate <b>warehouse location labels</b> with barcodes and arrows pointing up or down. One label per page,
+      sized for your 12&times;4&Prime; printer. Three steps: pick your arrow rules, enter your locations, hit Generate.
+    </div>
+
+    <!-- STEP 1 -->
+    <div class="step">
+      <div class="num">1</div>
+      <div class="step-body">
+        <h2>Set arrow direction by level</h2>
+        <p>The last digit of a location is the level (e.g. <code>K2-01-05-<b>3</b></code>).
+           Pick whether each level should print an UP or DOWN arrow.</p>
+        <div class="mock">
+          <div class="mock-h">Arrow Direction (by Level)</div>
+          <div class="row">
+            <span class="pill"><span class="lvl">Level 1:</span> <span class="dir">DOWN ▾</span></span>
+            <span class="pill"><span class="lvl">Level 2:</span> <span class="dir">DOWN ▾</span></span>
+            <span class="pill"><span class="lvl">Level 3:</span> <span class="dir">UP ▾</span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- STEP 2 -->
+    <div class="step">
+      <div class="num">2</div>
+      <div class="step-body">
+        <h2>Enter your locations (pick one mode)</h2>
+        <p>Three ways to give the app your locations. Use whichever is easiest.</p>
+
+        <div class="mock" style="margin-bottom: 12px;">
+          <div class="tabs">
+            <span class="tab active">Manual Entry</span>
+            <span class="tab">Bulk Paste</span>
+            <span class="tab">Import CSV</span>
+          </div>
+          <div class="input-line">
+            <span class="input-box">K2-01-01-1</span>
+            <span class="thru">THRU</span>
+            <span class="input-box">K2-01-100-3</span>
+          </div>
+        </div>
+
+        <p style="margin-top: 8px;"><b style="color: var(--text);">Manual Entry</b> &mdash; type a start and end location. The app fills everything in between.</p>
+
+        <p style="margin-top: 16px;"><b style="color: var(--text);">Bulk Paste</b> &mdash; paste many ranges at once, one per line:</p>
+        <div class="mock" style="font-family: var(--mono); font-size: 12.5px; color: var(--text-muted); padding: 14px 16px;">
+          K2-02-01-1 THRU K2-02-105-3<br/>
+          K2-03-01-1 THRU K2-03-105-3<br/>
+          K2-04-01-1 THRU K2-04-105-3
+        </div>
+
+        <p style="margin-top: 16px;"><b style="color: var(--text);">Import CSV</b> &mdash; drag in a CSV with one location per row.
+           Format: <code>Location,Arrow</code> (arrow = UP, DOWN, or NONE).</p>
+        <div class="mock">
+          <div class="csv-drop">⬆ &nbsp; Drag &amp; drop a CSV file here</div>
+        </div>
+
+        <div class="tip"><b>Tip:</b> CSV mode lets you control every row's arrow individually. The level rules from Step 1 are ignored when using CSV.</div>
+      </div>
+    </div>
+
+    <!-- STEP 3 -->
+    <div class="step">
+      <div class="num">3</div>
+      <div class="step-body">
+        <h2>Preview &amp; Generate</h2>
+        <p>Hit <b>Preview</b> to see every label that will print. Once it looks right, hit <b>Generate PDF</b> and choose where to save it.</p>
+
+        <div class="mock" style="margin-bottom: 12px;">
+          <div class="mock-h">Preview <span style="color: var(--accent-bright); font-weight: 500;">(6 labels)</span></div>
+          <div class="pre-grid">
+            <div class="pre-cell">K2-01-01-1<span class="arr">↓</span></div>
+            <div class="pre-cell">K2-01-01-2<span class="arr">↓</span></div>
+            <div class="pre-cell">K2-01-01-3<span class="arr">↑</span></div>
+            <div class="pre-cell">K2-01-02-1<span class="arr">↓</span></div>
+            <div class="pre-cell">K2-01-02-2<span class="arr">↓</span></div>
+            <div class="pre-cell">K2-01-02-3<span class="arr">↑</span></div>
+          </div>
+        </div>
+
+        <div class="btns">
+          <span class="btn">Preview</span>
+          <span class="btn go">Generate PDF</span>
+        </div>
+
+        <div class="tip"><b>Tip:</b> The PDF opens automatically once it's saved &mdash; one label per page, ready to print on 12&times;4&Prime; stock.</div>
+      </div>
+    </div>
+
+    <div class="foot">SmartLabel &middot; v2.0</div>
+  </div>
+</body>
+</html>
