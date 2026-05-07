@@ -235,13 +235,14 @@ app.whenReady().then(() => {
   startBackend();
   setTimeout(createWindow, 1500);
 
-  // Background update check (only in packaged builds)
+  // Background update check + periodic recheck (only in packaged builds)
   if (app.isPackaged) {
-    setTimeout(() => {
+    const safeCheck = () =>
       autoUpdater.checkForUpdates().catch((e) => {
         console.log("[updater] check failed:", e && e.message ? e.message : e);
       });
-    }, 4000);
+    setTimeout(safeCheck, 4000);
+    setInterval(safeCheck, 15 * 60 * 1000); // re-check every 15 minutes
   }
 
   app.on("activate", () => {

@@ -22,7 +22,8 @@
       {
         "provider": "github",
         "owner": "CarbonNode",
-        "repo": "SmartLabel"
+        "repo": "SmartLabel",
+        "releaseType": "release"
       }
     ],
     "win": {

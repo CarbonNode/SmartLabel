@@ -804,6 +804,10 @@ async function openPromptGuide() {
 
 // --- Auto-update toast ---
 
+let dismissedUpdateVersion = null;
+let updateInProgress = false;
+let availableUpdateVersion = null;
+
 function setUpdateState(state) {
   document.querySelector(".up-state-available").style.display = state === "available" ? "grid" : "none";
   document.querySelector(".up-state-downloading").style.display = state === "downloading" ? "grid" : "none";
@@ -821,15 +825,21 @@ function dismissUpdateToast() {
   const toast = document.getElementById("update-toast");
   toast.classList.remove("show");
   toast.setAttribute("aria-hidden", "true");
+  // Remember user dismissed this version so we don't keep nagging
+  if (availableUpdateVersion && !updateInProgress) {
+    dismissedUpdateVersion = availableUpdateVersion;
+  }
 }
 
 async function startUpdateDownload() {
+  updateInProgress = true;
   showUpdateToast("downloading");
   document.getElementById("up-progress-sub").textContent = "Starting…";
   document.getElementById("up-bar-fill").style.width = "0%";
   if (window.api && window.api.downloadUpdate) {
     const r = await window.api.downloadUpdate();
     if (r && r.ok === false) {
+      updateInProgress = false;
       dismissUpdateToast();
       setStatus(`Update download failed: ${r.error || "unknown error"}`);
     }
@@ -845,7 +855,12 @@ async function installUpdateNow() {
 if (window.api && window.api.onUpdateEvent) {
   window.api.onUpdateEvent((channel, payload) => {
     if (channel === "update-available") {
-      const v = payload && payload.version ? `v${payload.version}` : "new version";
+      const version = payload && payload.version;
+      // Don't re-nag on the same version after dismissal, and don't interrupt an in-progress download
+      if (updateInProgress) return;
+      if (version && version === dismissedUpdateVersion) return;
+      availableUpdateVersion = version;
+      const v = version ? `v${version}` : "new version";
       document.getElementById("up-version-sub").textContent = `${v} ready to install`;
       showUpdateToast("available");
     } else if (channel === "update-progress") {
@@ -853,9 +868,9 @@ if (window.api && window.api.onUpdateEvent) {
       document.getElementById("up-bar-fill").style.width = `${pct}%`;
       document.getElementById("up-progress-sub").textContent = `${pct}%`;
     } else if (channel === "update-downloaded") {
+      updateInProgress = false;
       showUpdateToast("ready");
     } else if (channel === "update-error") {
-      // Keep silent unless a download was already in progress
       console.log("[updater]", payload && payload.message);
     }
   });
