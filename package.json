@@ -1,6 +1,6 @@
 {
   "name": "smartlabel",
-  "version": "2.0.6",
+  "version": "2.0.7",
   "description": "SmartLabel - warehouse location labels with barcodes",
   "author": "Best Way Distribution",
   "main": "main.js",
